@@ -1,0 +1,46 @@
+apiVersion: v2
+name: example-program
+version: 0.1.0
+
+dependencies:
+- name: python
+  version: "3.9.0"
+
+resources:
+- name: example-program
+  url: https://github.com/example/example-program/releases/download/v1.0.0/example-program.tar.gz
+
+templates:
+- name: example-program-deployment.yaml
+  data: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: example-program
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: example-program
+      template:
+        metadata:
+          labels:
+            app: example-program
+        spec:
+          containers:
+            - name: example-program
+              image: python:3.9.0
+              command: ["python3"]
+              args: ["example-program.py"]
+              resources:
+                limits:
+                  memory: "64Mi"
+                  cpu: "100m"
+              volumeMounts:
+              - name: example-program
+                mountPath: /app/example-program
+          volumes:
+            - name: example-program
+              configMap:
+                name: example-program
+
